@@ -2,6 +2,9 @@
 #include<sys/ipc.h>
 #include<sys/shm.h>
 #include<stdlib.h>
+#include<unistd.h>
+#include<signal.h>
+#include"../inc/common.h"
 
 int semId, shmId;
 shmRegion *shm = NULL;
