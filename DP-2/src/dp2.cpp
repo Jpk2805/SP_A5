@@ -25,5 +25,18 @@ int main(void){
 
     signal(SIGINT, cleanup);
 
+	// dp2 forked
+	pid_t dp2_pid = getpid(), dp1_pid = getppid();
+    char args[4][16];
+    snprintf(args[0], 16, "%d", shmId);
+    snprintf(args[1], 16, "%d", semId);
+    snprintf(args[2], 16, "%d", dp1_pid);
+    snprintf(args[3], 16, "%d", dp2_pid);
+    if (fork() == 0) {
+        execlp("../../DC/bin/DC", "dc", args[0], args[1], args[2], args[3], NULL);
+        perror("execlp dc");
+        exit(1);
+    }
+
 	return 0;
 }
