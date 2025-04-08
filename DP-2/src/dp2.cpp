@@ -25,7 +25,8 @@ int main(void){
 
     signal(SIGINT, cleanup);
 
-	// dp2 forked
+	// dp2 forked // semphore arguments
+	// may be something is missing
 	pid_t dp2_pid = getpid(), dp1_pid = getppid();
     char args[4][16];
     snprintf(args[0], 16, "%d", shmId);
