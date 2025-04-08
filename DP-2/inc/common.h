@@ -15,7 +15,7 @@
 #define SHM_KEY_PATH "/tmp"
 #define SHM_KEY_ID   42
 #define SEM_KEY_PATH "/tmp"
-#define SEM_KEY_ID   24 
+#define SEM_KEY_ID   24
 
 typedef struct {
     int readIndex;

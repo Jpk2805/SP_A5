@@ -1,3 +1,12 @@
+// File: dp1.c
+// Project: A-05: The Histogram System
+// Programmers: Vishvesh Lakhani, Ayush Rakholiya, Jay Patel, Hetvi Kaswala
+// Description: This program acts as the first Data Producer (DP-1) in the HISTO-SYSTEM.
+//     			It creates and initializes shared memory and semaphores, then forks and 
+//     			launches the second Data Producer (DP-2). DP-1 continuously generates a 
+//     			batch of random characters and writes them into the shared memory buffer,
+//     				ensuring synchronization using semaphores.
+// Date: April 7, 2025
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
@@ -10,6 +19,12 @@
 int semId, shmId;
 shmRegion *shm = NULL;
 
+// Function: cleanup
+// Description: Handles cleanup operations when a termination signalis received.
+//              It detaches the shared memory segment and exits the program gracefully.
+// Parameters: 
+//      int sig - The signal number that triggered the handler.
+// Returns: void
 void cleanup(int sig) {
     if (shm) shmdt(shm);
     exit(0);
