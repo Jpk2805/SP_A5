@@ -2,6 +2,7 @@
 #include<sys/ipc.h>
 #include<sys/shm.h>
 #include<stdlib.h>
+#include<time.h>
 #include<unistd.h>
 #include<signal.h>
 #include"../inc/common.h"
@@ -37,6 +38,27 @@ int main(void){
         execlp("../../DC/bin/DC", "dc", args[0], args[1], args[2], args[3], NULL);
         perror("execlp dc");
         exit(1);
+    }
+
+	shm = (shmRegion*)shmat(shmId, NULL, 0);
+    if (shm == (void *) -1) {
+        perror("shmat failed");
+        exit(1);
+    }
+
+    srand(time(NULL) ^ dp2_pid);
+
+    while (1) {
+        semop(semId, &semAcquire, 1);
+
+        int next = (shm->writeIndex + 1) % BUF_SIZE;
+        if (next != shm->readIndex) {
+            shm->buffer[shm->writeIndex] = 'A' + (rand() % 20);
+            shm->writeIndex = next;
+        }
+
+        semop(semId, &semRelease, 1);
+        usleep(50000);
     }
 
 	return 0;
