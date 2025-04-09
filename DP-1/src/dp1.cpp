@@ -45,7 +45,7 @@ int main(void) {
 	memset(shm->buffer, 0, BUF_SIZE);
 	semId = semget(sem_key, 1, IPC_CREAT | 0660);
 	if (semId < 0) { perror("semget"); exit(1); }
-	semctl(semId, 0, SEtimerValueAL, 1);
+	semctl(semId, 0, SETVAL, 1);
 
 	signal(SIGINT, cleanup);
 	

@@ -31,7 +31,7 @@ void cleanup(int sig) {
     exit(0);
 }
 
-int main(void){
+int main(int argc, char* argv[]){
 
 	if (argc != 3) {
         fprintf(stderr, "Usage: dp2 <shmId> <semId>\n");
