@@ -19,16 +19,7 @@
 int semId, shmId;
 shmRegion *shm = NULL;
 
-// Function: cleanup
-// Description: Handles cleanup operations when a termination signalis received.
-//              It detaches the shared memory segment and exits the program gracefully.
-// Parameters: 
-//      int sig - The signal number that triggered the handler.
-// Returns: void
-void cleanup(int sig) {
-    if (shm) shmdt(shm);
-    exit(0);
-}
+void cleanup(int sig);
 
 int main(void) {
 	
@@ -81,4 +72,15 @@ int main(void) {
         sleep(2);
     }
  	return 0;
+}
+
+// Function: cleanup
+// Description: Handles cleanup operations when a termination signalis received.
+//              It detaches the shared memory segment and exits the program gracefully.
+// Parameters: 
+//      int sig - The signal number that triggered the handler.
+// Returns: void
+void cleanup(int sig) {
+    if (shm) shmdt(shm);
+    exit(0);
 }
