@@ -20,16 +20,7 @@
 int semId, shmId;
 shmRegion *shm = NULL;
 
-// Function: cleanup
-// Description: Handles cleanup operations when a termination signalis received.
-//              It detaches the shared memory segment and exits the program gracefully.
-// Parameters: 
-//      int sig - The signal number that triggered the handler.
-// Returns: void
-void cleanup(int sig) {
-    if (shm) shmdt(shm);
-    exit(0);
-}
+void cleanup(int sig);
 
 int main(int argc, char* argv[]){
 
@@ -45,14 +36,15 @@ int main(int argc, char* argv[]){
     signal(SIGINT, cleanup);
 
     // Prepare arguments to pass to the DC (data consumer) program
-	// dp2 forked // semphore arguments
+	// dp2 forked 
+    // semphore arguments
 	// May be something is missing
-	pid_t dp2_pid = getpid(), dp1_pid = getppid();
+	pid_t dp2PID = getpid(), dp1PID = getppid();
     char args[4][16];
     snprintf(args[0], 16, "%d", shmId);
     snprintf(args[1], 16, "%d", semId);
-    snprintf(args[2], 16, "%d", dp1_pid);
-    snprintf(args[3], 16, "%d", dp2_pid);
+    snprintf(args[2], 16, "%d", dp1PID);
+    snprintf(args[3], 16, "%d", dp2PID);
     if (fork() == 0) {
         execlp("../../DC/bin/DC", "dc", args[0], args[1], args[2], args[3], NULL);
         perror("execlp dc");
@@ -66,7 +58,7 @@ int main(int argc, char* argv[]){
     }
 
     // Seed the random number generator using time and dp2 process ID
-    srand(time(NULL) ^ dp2_pid);
+    srand(time(NULL) ^ dp2PID);
 
     // Main loop: continuously write random characters to shared memory
     while (1) {
@@ -83,4 +75,16 @@ int main(int argc, char* argv[]){
     }
 
 	return 0;
+}
+
+// Function: cleanup
+// Description: Handles cleanup operations when a termination signalis received.
+//              It detaches the shared memory segment and exits the program gracefully.
+// Parameters: 
+//      int sig - The signal number that triggered the handler.
+// Returns: void
+
+void cleanup(int sig) {
+    if (shm) shmdt(shm);
+    exit(0);
 }
