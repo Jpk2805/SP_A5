@@ -1,8 +1,9 @@
 #include<stdio.h>
-#include<sys/ipc.h>
-#include<sys/shm.h>
 #include<stdlib.h>
-#include "../inc/common.h"
+#include<sys/time.h>
+#include<time.h>
+#include<signal.h>
+#include"../inc/common.h"
 
 int shmId, semId;
 int dp1PID, dp2PID;
@@ -12,6 +13,7 @@ volatile sig_atomic_t done = 0;
 
 void sigint_handler(int sig);
 void alarm_handler(int sig);
+void print_histogram(void);
 
 
 int main(int argc, char* argv[]){
@@ -30,16 +32,38 @@ int main(int argc, char* argv[]){
     signal(SIGINT, sigint_handler);
     signal(SIGALRM, alarm_handler);
 
-	//while loop for reading from the buffer 
-	//
-	//crear the screen then print the count of each latter.
+	struct itimerval tv;
+    tv.it_value.tv_sec = 2;
+    tv.it_value.tv_usec = 0;
+    tv.it_interval.tv_sec = 2;
+    tv.it_interval.tv_usec = 0;
+    setitimer(ITIMER_REAL, &tv, NULL);
+
+    time_t last_print = time(NULL);
+	while (1){
+		pause();
+        if (done && shm->readIndex == shm->writeIndex) {
+            print_histogram();
+            shmdt(shm);
+            shmctl(shmId, IPC_RMID, NULL);
+            semctl(semId, 0, IPC_RMID);
+            puts("Shazam !!");
+            exit(0);
+        }
+        if (time(NULL) - last_print >= 10) {
+            print_histogram();
+            last_print = time(NULL);
+        }
+	}
+
+	
 	return 0;
 }
 
 
 void sigint_handler(int sig) {
     done = 1;
-    kill(dp1PID, SIGINT);
+    kill(dp1PID, SIGINT); 
     kill(dp2PID, SIGINT);
 }
 
@@ -54,4 +78,17 @@ void alarm_handler(int sig) {
         if (c >= 'A' && c <= 'T') counts[c - 'A']++;
     }
     semop(semId, &semRelease, 1);
+}
+
+void print_histogram(void) {
+    system("clear");
+    for (int i = 0; i < 20; ++i) {
+        int n = counts[i];
+        printf("%c-%03d ", 'A'+i, n);
+        int hundreds = n/100, tens = (n%100)/10, ones = n%10;
+        for(int j=0;j<hundreds;j++) putchar('*');
+        for(int j=0;j<tens;j++) putchar('+');
+        for(int j=0;j<ones;j++) putchar('-');
+        putchar('\n');
+    }
 }
